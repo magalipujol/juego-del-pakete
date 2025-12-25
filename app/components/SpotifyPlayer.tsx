@@ -21,18 +21,11 @@ interface SuggestedSong {
 }
 
 const SUGGESTED_SONGS: SuggestedSong[] = [
-  { name: 'Despacito', artist: 'Luis Fonsi', query: 'Despacito Luis Fonsi' },
-  { name: 'Bailando', artist: 'Enrique Iglesias', query: 'Bailando Enrique Iglesias' },
-  { name: 'La Bicicleta', artist: 'Shakira & Carlos Vives', query: 'La Bicicleta Shakira Carlos Vives' },
-  { name: 'Vivir Mi Vida', artist: 'Marc Anthony', query: 'Vivir Mi Vida Marc Anthony' },
-  { name: 'Danza Kuduro', artist: 'Don Omar', query: 'Danza Kuduro Don Omar' },
-  { name: 'Gasolina', artist: 'Daddy Yankee', query: 'Gasolina Daddy Yankee' },
-  { name: 'Waka Waka', artist: 'Shakira', query: 'Waka Waka Shakira' },
-  { name: 'Chantaje', artist: 'Shakira & Maluma', query: 'Chantaje Shakira Maluma' },
-  { name: 'Me Rehúso', artist: 'Danny Ocean', query: 'Me Rehuso Danny Ocean' },
-  { name: 'Uptown Funk', artist: 'Bruno Mars', query: 'Uptown Funk Bruno Mars' },
-  { name: 'Shape of You', artist: 'Ed Sheeran', query: 'Shape of You Ed Sheeran' },
-  { name: 'Blinding Lights', artist: 'The Weeknd', query: 'Blinding Lights The Weeknd' },
+  { name: 'De Música Ligera', artist: 'Soda Stereo', query: 'De Musica Ligera Soda Stereo' },
+  { name: 'Persiana Americana', artist: 'Soda Stereo', query: 'Persiana Americana Soda Stereo' },
+  { name: 'Bohemian Rhapsody', artist: 'Queen', query: 'Bohemian Rhapsody Queen' },
+  { name: 'Sweet Child O Mine', artist: "Guns N' Roses", query: 'Sweet Child O Mine Guns N Roses' },
+  { name: 'Back in Black', artist: 'AC/DC', query: 'Back in Black ACDC' },
 ];
 
 export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
@@ -46,6 +39,7 @@ export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
   const [maxSeconds, setMaxSeconds] = useState(30);
   const [pauseAt, setPauseAt] = useState<number | null>(null);
   const [gameActive, setGameActive] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Array<{ uri: string; name: string; artists: string; image: string }>>([]);
@@ -244,6 +238,7 @@ export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
 
     setPauseAt(pauseAtMs);
     setGameActive(true);
+    setGameStarted(true);
     setMessage('¡Juego en curso!');
 
     if (pauseTimeoutRef.current) {
@@ -484,12 +479,17 @@ export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
             onClick={startGame}
             className="flex-1 px-6 py-3 bg-green-600 rounded-lg hover:bg-green-500 transition font-medium"
           >
-            {gameActive ? 'Reiniciar' : 'Iniciar Juego'}
+            {gameStarted ? 'Reiniciar' : 'Iniciar Juego'}
           </button>
-          {!gameActive && currentTrack && (
+          {gameStarted && (
             <button
               onClick={continueGame}
-              className="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500 transition font-medium"
+              disabled={gameActive}
+              className={`flex-1 px-6 py-3 rounded-lg transition font-medium ${
+                gameActive
+                  ? 'bg-zinc-600 text-zinc-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-500'
+              }`}
             >
               Continuar
             </button>
