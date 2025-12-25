@@ -1,5 +1,11 @@
 const CLIENT_ID = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || '';
-const REDIRECT_URI = 'http://127.0.0.1:3000/callback';
+
+function getRedirectUri(): string {
+  if (typeof window === 'undefined') return '';
+  const baseUrl = window.location.origin;
+  const basePath = process.env.NODE_ENV === 'production' ? '/juego-del-pakete' : '';
+  return `${baseUrl}${basePath}/callback`;
+}
 const SCOPES = [
   'streaming',
   'user-read-email',
@@ -40,7 +46,7 @@ export async function redirectToSpotifyAuth(): Promise<void> {
     scope: SCOPES,
     code_challenge_method: 'S256',
     code_challenge: codeChallenge,
-    redirect_uri: REDIRECT_URI,
+    redirect_uri: getRedirectUri(),
   });
 
   window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
@@ -63,7 +69,7 @@ export async function getAccessToken(code: string): Promise<{ token: string | nu
         client_id: CLIENT_ID,
         grant_type: 'authorization_code',
         code,
-        redirect_uri: REDIRECT_URI,
+        redirect_uri: getRedirectUri(),
         code_verifier: codeVerifier,
       }),
     });
