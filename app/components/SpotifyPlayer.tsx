@@ -224,6 +224,38 @@ export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
     setMessage('Juego detenido');
   };
 
+  const continueGame = async () => {
+    if (!player) {
+      setMessage('El reproductor no esta listo');
+      return;
+    }
+
+    if (minSeconds >= maxSeconds) {
+      setMessage('El segundo minimo debe ser menor que el maximo');
+      return;
+    }
+
+    const randomSeconds = Math.random() * (maxSeconds - minSeconds) + minSeconds;
+    const pauseInMs = randomSeconds * 1000;
+
+    await player.resume();
+
+    setPauseAt(position + pauseInMs);
+    setGameActive(true);
+    setMessage('Continuando...');
+
+    if (pauseTimeoutRef.current) {
+      clearTimeout(pauseTimeoutRef.current);
+    }
+
+    pauseTimeoutRef.current = setTimeout(async () => {
+      await player.pause();
+      setGameActive(false);
+      setMessage(`La musica se pauso despues de ${randomSeconds.toFixed(2)} segundos`);
+      setPauseAt(null);
+    }, pauseInMs);
+  };
+
   const handleLogout = () => {
     if (player) {
       player.disconnect();
@@ -401,7 +433,7 @@ export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
             </button>
           ) : currentTrack && (
             <button
-              onClick={startGame}
+              onClick={continueGame}
               className="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500 transition font-medium"
             >
               Continuar
