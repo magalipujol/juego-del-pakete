@@ -14,6 +14,27 @@ interface Track {
   duration: number;
 }
 
+interface SuggestedSong {
+  name: string;
+  artist: string;
+  query: string;
+}
+
+const SUGGESTED_SONGS: SuggestedSong[] = [
+  { name: 'Despacito', artist: 'Luis Fonsi', query: 'Despacito Luis Fonsi' },
+  { name: 'Bailando', artist: 'Enrique Iglesias', query: 'Bailando Enrique Iglesias' },
+  { name: 'La Bicicleta', artist: 'Shakira & Carlos Vives', query: 'La Bicicleta Shakira Carlos Vives' },
+  { name: 'Vivir Mi Vida', artist: 'Marc Anthony', query: 'Vivir Mi Vida Marc Anthony' },
+  { name: 'Danza Kuduro', artist: 'Don Omar', query: 'Danza Kuduro Don Omar' },
+  { name: 'Gasolina', artist: 'Daddy Yankee', query: 'Gasolina Daddy Yankee' },
+  { name: 'Waka Waka', artist: 'Shakira', query: 'Waka Waka Shakira' },
+  { name: 'Chantaje', artist: 'Shakira & Maluma', query: 'Chantaje Shakira Maluma' },
+  { name: 'Me Rehúso', artist: 'Danny Ocean', query: 'Me Rehuso Danny Ocean' },
+  { name: 'Uptown Funk', artist: 'Bruno Mars', query: 'Uptown Funk Bruno Mars' },
+  { name: 'Shape of You', artist: 'Ed Sheeran', query: 'Shape of You Ed Sheeran' },
+  { name: 'Blinding Lights', artist: 'The Weeknd', query: 'Blinding Lights The Weeknd' },
+];
+
 export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
   const [player, setPlayer] = useState<Spotify.Player | null>(null);
   const [deviceId, setDeviceId] = useState<string | null>(null);
@@ -179,6 +200,31 @@ export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
     setSearchQuery('');
   };
 
+  const playSuggestedSong = async (song: SuggestedSong) => {
+    const token = await getToken();
+    if (!token || !deviceId) return;
+
+    const response = await fetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(song.query)}&type=track&limit=1`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    const data = await response.json();
+    if (data.tracks?.items?.[0]) {
+      const trackUri = data.tracks.items[0].uri;
+      await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ uris: [trackUri] }),
+      });
+    }
+  };
+
   const startGame = async () => {
     if (!player || !isPlaying) {
       setMessage('Primero selecciona y reproduce una cancion');
@@ -331,6 +377,23 @@ export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Suggested Songs */}
+      <div className="w-full max-w-2xl">
+        <h3 className="text-lg font-bold mb-3 text-zinc-300">Canciones sugeridas</h3>
+        <div className="flex flex-wrap gap-2">
+          {SUGGESTED_SONGS.map((song) => (
+            <button
+              key={song.query}
+              onClick={() => playSuggestedSong(song)}
+              className="px-3 py-2 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition text-left border border-zinc-700 hover:border-green-500"
+            >
+              <p className="font-medium text-sm">{song.name}</p>
+              <p className="text-xs text-zinc-400">{song.artist}</p>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Current Track */}
