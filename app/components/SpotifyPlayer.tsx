@@ -198,7 +198,7 @@ export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
 
     setPauseAt(pauseAtMs);
     setGameActive(true);
-    setMessage(`El juego ha comenzado. La musica se pausara en algun momento...`);
+    setMessage('¡Juego en curso!');
 
     if (pauseTimeoutRef.current) {
       clearTimeout(pauseTimeoutRef.current);
@@ -207,7 +207,7 @@ export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
     pauseTimeoutRef.current = setTimeout(async () => {
       await player.pause();
       setGameActive(false);
-      setMessage(`La musica se pauso en el segundo ${randomSeconds.toFixed(2)}`);
+      setMessage('¡Pausado!');
       setPauseAt(null);
     }, pauseAtMs);
   };
@@ -251,7 +251,7 @@ export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
     pauseTimeoutRef.current = setTimeout(async () => {
       await player.pause();
       setGameActive(false);
-      setMessage(`La musica se pauso despues de ${randomSeconds.toFixed(2)} segundos`);
+      setMessage('¡Pausado!');
       setPauseAt(null);
     }, pauseInMs);
   };
@@ -448,12 +448,6 @@ export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
         )}
       </div>
 
-      {/* Debug info */}
-      {pauseAt !== null && gameActive && (
-        <div className="text-xs text-zinc-500">
-          (Debug: pausara en {(pauseAt / 1000).toFixed(2)}s)
-        </div>
-      )}
     </div>
   );
 }
