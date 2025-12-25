@@ -419,19 +419,11 @@ export default function SpotifyPlayer({ onLogout }: SpotifyPlayerProps) {
         <div className="flex gap-4">
           <button
             onClick={startGame}
-            disabled={gameActive}
-            className="flex-1 px-6 py-3 bg-green-600 rounded-lg hover:bg-green-500 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-6 py-3 bg-green-600 rounded-lg hover:bg-green-500 transition font-medium"
           >
-            {gameActive ? 'Juego en curso...' : 'Iniciar Juego'}
+            {gameActive ? 'Reiniciar' : 'Iniciar Juego'}
           </button>
-          {gameActive ? (
-            <button
-              onClick={stopGame}
-              className="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500 transition font-medium"
-            >
-              Detener
-            </button>
-          ) : currentTrack && (
+          {!gameActive && currentTrack && (
             <button
               onClick={continueGame}
               className="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500 transition font-medium"
